@@ -39,8 +39,8 @@ button,select{font-family:inherit}
 .edit-bar .cnt b{color:var(--ink)}
 .btn{border:1px solid var(--line);background:#fff;color:var(--ink2);font-size:13px;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer}
 .btn:hover{border-color:#c9ced6}
-.btn.pri{background:#3b3f46;border-color:#3b3f46;color:#fff}
-.btn.pri:hover{background:#2a2d33;border-color:#2a2d33}
+.btn.pri{background:#eceef1;border-color:#e0e3e8;color:var(--ink)}
+.btn.pri:hover{background:#e2e5e9;border-color:#d3d7dd}
 .btn:disabled{opacity:.4;cursor:default}
 
 /* 실적표 */
@@ -276,11 +276,6 @@ td .chg{display:block;font-size:10px;font-weight:600;color:var(--warn);line-heig
     <span class="eyebrow">CONTENTS CALENDAR · 2026.03 – 12</span>
     <h1><em>2026</em> 콘텐츠 발행 캘린더</h1>
     <p class="sub">테마별뉴스 발행 기준</p>
-    <div class="legend">
-      <span><i style="background:var(--plan)"></i>시정기획</span>
-      <span><i style="background:var(--news)"></i>시정소식</span>
-      <span><i style="background:var(--cur)"></i>큐레이션</span>
-    </div>
   </header>
 
   <section class="sec">
@@ -443,6 +438,7 @@ function renderTabs(){
   const totalOf = c => MONTHS.reduce((s,m)=>s+count(m,c),0);
   let ct = `<button class="chip cat ${state.cat==='all'?'on':''}" data-c="all">전체<em>${totalOf('all')}</em></button>`;
   Object.entries(CATS).forEach(([k,c]) => ct += `<button class="chip cat ${state.cat===k?'on':''}" data-c="${k}">${c.name}<em>${totalOf(k)}</em></button>`);
+  ct += `<button class="chip tog ${planOpen?'on':''}" data-t="plan" aria-expanded="${planOpen}" aria-controls="plan-ye">연말 발행 계획</button>`;
   document.getElementById('catTabs').innerHTML = ct;
 
   const allOn = state.mon==='all';
@@ -451,7 +447,6 @@ function renderTabs(){
     : '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   let mt = `<button class="chip mon all ${allOn?'on':''}" data-m="all" aria-expanded="${allOn}">${allOn?'전체 닫기':'전체 펼치기'}${ico}</button>`;
   MONTHS.forEach(m => mt += `<button class="chip mon ${state.mon===m?'on':''}" data-m="${m}">${m}월<em>${count(m,state.cat)}</em></button>`);
-  mt += `<button class="chip tog ${planOpen?'on':''}" data-t="plan" aria-expanded="${planOpen}" aria-controls="plan-ye">연말 발행 계획</button>`;
   document.getElementById('monTabs').innerHTML = mt;
   document.getElementById('plan-ye').classList.toggle('open', planOpen);
 }
@@ -506,6 +501,12 @@ function render(){
 /* 이벤트 */
 document.getElementById('catTabs').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if(!b) return;
+  if(b.dataset.t==='plan'){
+    planOpen = !planOpen; renderTabs();
+    if(planOpen){ const s = document.getElementById('plan-ye'), c = document.querySelector('.controls');
+      window.scrollTo({ top: s.getBoundingClientRect().top + window.scrollY - c.offsetHeight - 12, behavior:'smooth' }); }
+    return;
+  }
   state.cat = b.dataset.c; render();
 });
 document.getElementById('monTabs').addEventListener('click', e => {
